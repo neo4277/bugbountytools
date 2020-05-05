@@ -10,7 +10,7 @@ fi
 
 now="$(date +"%m-%d-%Y")"
 time="$(date +"%l;%M %p")"
-folder=/Users/$USER/SubdomainScans/${domain}/${now}/
+folder="/Users/$USER/SubdomainScans/${domain}/${now}/"
 
 mkdir -p ${folder}
 
@@ -37,30 +37,29 @@ awk -v RS="	" '{print}' "${folder}sublist3r CNAME spaces" > "${folder}sublist3r 
 #awk -v RS=" " '{print}' "${folder}sublist3r CNAME spaces" > "${folder}sublist3r CNAME spaces"
 #awk -v RS="	" '{print}' "${folder}sublist3r CNAME spaces" > "${folder}sublist3r CNAME spaces"
 
-aws="amazonaws"
-github="github.io"
-heroku="herokudns.com"
-readme="readme.io"
-
 echo Checking scans for possible subdomain takeovers...
 echo "$(<"${folder}sublist3r CNAME spaces 2")" | grep -e amazonaws -e github.io -e herokudns -e readme.io > "${folder}sublist3r CNAME spaces 3"
 while read -r line
 do
-	echo --------------------------
-	echo "$line"
-	echo --------------------------
+#	echo --------------------------
+#	echo "$line"
+#	echo --------------------------
 	
-	echo Detecting Amazon...
-	grep -q 'amazonaws' <<< $line && (http --ignore-stdin -b GET http://$line | grep -E -q '<Code>NoSuchBucket</Code>|<li>Code: NoSuchBucket</li>' && echo "[!!!] $line - Subdomain takeover may be possible for $line" || echo X)
+#	echo Detecting Amazon...
+	grep -q 'amazonaws' <<< $line && http --ignore-stdin -b GET http://$line | grep -E -q '<Code>NoSuchBucket</Code>|<li>Code: NoSuchBucket</li>' && echo "[!!!] $line - Subdomain takeover may be possible for $line"
 
-	echo Detecting Github...
-	grep -q 'github.io' <<< $line && (http --ignore-stdin -b GET http://$line | grep -F -q "<strong>There isn't a GitHub Pages site here.</strong>" && echo "[!!!] $line - Subdomain takeover may be possible for $line" || echo X)
+#	echo Detecting Github...
+	grep -q 'github.io' <<< $line && http --ignore-stdin -b GET http://$line | grep -F -q "<strong>There isn't a GitHub Pages site here.</strong>" && echo "[!!!] $line - Subdomain takeover may be possible for $line"
 
-	echo Detecting Heroku...
-	grep -q 'herokudns.com' <<< $line && (http --ignore-stdin -b GET http://$line | grep -F -q "//www.herokucdn.com/error-pages/no-such-app.html" && echo "[!!!] $line - Subdomain takeover may be possible for $line" || echo X)
+#	echo Detecting Heroku...
+	grep -q 'herokudns.com' <<< $line && http --ignore-stdin -b GET http://$line | grep -F -q "//www.herokucdn.com/error-pages/no-such-app.html" && echo "[!!!] $line - Subdomain takeover may be possible for $line"
 
-	echo Detecting Readme...
-	grep -q 'readme.io' <<< $line && (http --ignore-stdin -b GET http://$line | grep -F -q "Project doesnt exist... yet!" && echo "[!!!] $line - Subdomain takeover may be possible" || echo X)
-done < "${folder}sublist3r CNAME spaces 3"
+#	echo Detecting Readme...
+	grep -q 'readme.io' <<< $line && http --ignore-stdin -b GET http://$line | grep -F -q "Project doesnt exist... yet!" && echo "[!!!] $line - Subdomain takeover may be possible"
 
-echo Done!
+echo "------------ $line ------------" >> "${folder}HTTP request results ${time}"
+http --ignore-stdin -b GET http://$line >> "${folder}HTTP request results ${time}" 2> /dev/null
+echo " " >> "${folder}HTTP request results ${time}"
+done < "${folder}sublist3r ${time}"
+
+echo -e "\033[44mDone!"
