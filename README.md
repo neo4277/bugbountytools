@@ -1,3 +1,3 @@
 # bugbountytools
 
-Small personal project attempting to scan for subdomain takeovers.
+Small personal project attempting ~~~very poorly~~~ to scan for subdomain takeovers.
