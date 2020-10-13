@@ -35,7 +35,7 @@ for file in "${folder}sublist3rSorted"; do
 #		dig "$line" >> "${folder}sublist3r DiG Records ${time}"
 		dig "$line" >> "${folder}sublist3r DiG Records"
 		status=`curl -o /dev/null -Isw '%{http_code}' "$line" --max-time 5`
-		if [ "$status" == 2* ] || [ "$status" == 3* ]; then
+		if [ "$status" = 200 ] || [ "$status" = 301 ]; then
 #			echo "$line" >> "${folder}Webpages That Are Up"
 			echo "$line"
 		fi
