@@ -30,15 +30,16 @@ python3 /usr/bin/sublist3r.py -d $domain -n -o "${folder}sublist3r" >> /dev/null
 echo Starting to get CNAMES for items in Sublist3r...
 #for file in "${folder}sublist3r ${time}"; do
 sed 's/<BR>/\n/g' "${folder}sublist3r" >> "${folder}sublist3r - Sorted"
-for file in "${folder}sublist3rSorted"; do
+for file in "${folder}sublist3r - Sorted"; do
 	while read -r line; do
-#		dig "$line" >> "${folder}sublist3r DiG Records ${time}"
+#		dig "$line" >> "${folder}
+DiG Records ${time}"
 		dig "$line" >> "${folder}sublist3r DiG Records"
-		status=`curl -o /dev/null -Isw '%{http_code}' "$line" --max-time 5`
-		if [ "$status" = 200 ] || [ "$status" = 301 ]; then
+#		status=`curl -o /dev/null -Isw '%{http_code}' "$line" --max-time 5`
+#		if [ "$status" = 201 ] || [ "$status" = 301 ]; then
 #			echo "$line" >> "${folder}Webpages That Are Up"
-			echo "$line"
-		fi
+#			echo "$line"
+#		fi
 	done < "$file"
 done
 #echo "$(<"${folder}sublist3r DiG Records ${time}")" | grep CNAME > "${folder}""sublist3r with CNAME ${time}"
