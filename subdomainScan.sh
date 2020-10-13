@@ -10,9 +10,11 @@ fi
 
 now="$(date +"%m-%d-%Y")"
 time="$(date +"%l;%M %p")"
-folder="/Users/$USER/SubdomainScans/${domain}/${now}/"
+folder="/usr/SubdomainScans/${domain}/${now}/"
 
 mkdir -p ${folder}
+
+echo Starting... "(${folder})"
 
 echo Checking shodan...
 #shodan domain $domain | sed "s,$(printf '\033')\\[[0-9;]*[a-zA-Z],,g" > "${folder}shodan ${time}"
@@ -23,14 +25,20 @@ shodan domain $domain | sed "s,$(printf '\033')\\[[0-9;]*[a-zA-Z],,g" >> "${fold
 
 echo Checking sublist3r...
 #python /$USER/Sublist3r/sublist3r.py -d $domain -n -o "${folder}sublist3r ${time}" > /dev/null
-python /$USER/Sublist3r/sublist3r.py -d $domain -n -o "${folder}sublist3r" >> /dev/null
+python3 /usr/bin/sublist3r.py -d $domain -n -o "${folder}sublist3r" >> /dev/null
 
 echo Starting to get CNAMES for items in Sublist3r...
 #for file in "${folder}sublist3r ${time}"; do
-for file in "${folder}sublist3r"; do
+sed 's/<BR>/\n/g' "${folder}sublist3r" >> "${folder}sublist3r - Sorted"
+for file in "${folder}sublist3rSorted"; do
 	while read -r line; do
 #		dig "$line" >> "${folder}sublist3r DiG Records ${time}"
 		dig "$line" >> "${folder}sublist3r DiG Records"
+		status=`curl -o /dev/null -Isw '%{http_code}' "$line" --max-time 5`
+		if [ "$status" == 2* ] || [ "$status" == 3* ]; then
+#			echo "$line" >> "${folder}Webpages That Are Up"
+			echo "$line"
+		fi
 	done < "$file"
 done
 #echo "$(<"${folder}sublist3r DiG Records ${time}")" | grep CNAME > "${folder}""sublist3r with CNAME ${time}"
